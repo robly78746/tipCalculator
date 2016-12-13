@@ -4,6 +4,7 @@
 <h1>Tip Calculator</h1>
 <?php 
 $invalid = false; 
+define("DEFAULT_VAL", 0);
 function check_input($data) {
 	$data = trim($data);
 	$data = stripslashes($data);
@@ -28,14 +29,14 @@ $total = null;
 if($_SERVER["REQUEST_METHOD"] == "POST")
 {
 	$billSubtotal = check_input(empty($_POST['billSubtotal']) ? '' : $_POST['billSubtotal']);
-	$percentage = check_input(empty($_POST['tipPercentage']) ? '' : $_POST['tipPercentage']);
+	$tipPercentage = check_input(empty($_POST['tipPercentage']) ? '' : $_POST['tipPercentage']);
 	
 
-	if(is_numeric($billSubtotal) && is_numeric($percentage)) {
+	if(is_numeric($billSubtotal) && is_numeric($tipPercentage)) {
 		$billSubtotal = floatval($billSubtotal);
-		$percentage = floatval($percentage);
-		if(check_bill($billSubtotal) && check_percentage($percentage)) {
-			$tipVal = $percentage / 100 * $billSubtotal;
+		$tipPercentage = floatval($tipPercentage);
+		if(check_bill($billSubtotal) && check_percentage($tipPercentage)) {
+			$tipVal = $tipPercentage / 100 * $billSubtotal;
 			$tip = sprintf('%0.2f', $tipVal);
 			$totalVal = $tip + $billSubtotal;
 			$total = sprintf('%0.2f', $totalVal);
@@ -43,17 +44,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 	} else {
 		$invalid = true;
 	}
-}?>
+}
+
+$billSubtotalVal = $invalid ? DEFAULT_VAL : $billSubtotal;
+$tipPercentageVal = $invalid ? DEFAULT_VAL : $tipPercentage;
+?>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-	Bill subtotal: $<input type="text" name="billSubtotal" value = <?php echo $invalid ? 0 : $billSubtotal;?>><br>
+	Bill subtotal: $<input type="text" name="billSubtotal" value = <?php echo htmlentities($billSubtotalVal);?>><br>
 	<br>Tip percentage:<br>
 	
 <?php
-$percentages = array(10,  15, 20);
-echo "Hello world";
+$percentages = array(10.0,  15.0, 20.0);
 ?><br>
 <?php foreach($percentages as $percent) { ?>
-	<input type="radio" name="tipPercentage" value=<?php echo htmlentities($percent);?>><?php echo htmlentities($percent);?>%
+	<input type="radio" name="tipPercentage" value=<?php echo htmlentities($percent);?> <?php echo htmlentities($tipPercentageVal === $percent ? 'checked' : '');?> ><?php echo htmlentities($percent);?>%
 <?php } ?>
 <br>
 <input type="submit" value="Submit">
