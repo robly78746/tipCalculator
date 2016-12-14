@@ -10,7 +10,6 @@ p {
 }
 
 input {
-	background-color: black;
 	border-style: solid;
 	border-color: green;
 	border-width: 1px;
@@ -20,4 +19,6 @@ p, form, h1, body, input, textarea{
 	font-family: "Lucida Sans Typewriter";
 	color: green;
 	background-color: black;
+	margin: auto;
+	text-align: center;
 }
