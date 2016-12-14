@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
+<head>
+<link rel="stylesheet" type="text/css" href="tipCalculator.css">
+</head>
 <body>
 <h1>Tip Calculator</h1>
 <?php 
-$invalid = false; 
+$valid = false; 
 define("DEFAULT_VAL", 0);
 function check_input($data) {
 	$data = trim($data);
@@ -40,14 +43,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 			$tip = sprintf('%0.2f', $tipVal);
 			$totalVal = $tip + $billSubtotal;
 			$total = sprintf('%0.2f', $totalVal);
+			$valid = true;
 		}
 	} else {
-		$invalid = true;
+		$valid = false;
 	}
 }
 
-$billSubtotalVal = $invalid ? DEFAULT_VAL : $billSubtotal;
-$tipPercentageVal = $invalid ? DEFAULT_VAL : $tipPercentage;
+$billSubtotalVal = $valid ? $billSubtotal : DEFAULT_VAL;
+$tipPercentageVal = $valid ? $tipPercentage : DEFAULT_VAL;
 ?>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 	Bill subtotal: $<input type="text" name="billSubtotal" value = <?php echo htmlentities($billSubtotalVal);?>><br>
@@ -60,17 +64,20 @@ $percentages = array(10.0,  15.0, 20.0);
 	<input type="radio" name="tipPercentage" value=<?php echo htmlentities($percent);?> <?php echo htmlentities($tipPercentageVal === $percent ? 'checked' : '');?> ><?php echo htmlentities($percent);?>%
 <?php } ?>
 <br>
-<input type="submit" value="Submit">
+<br>
+<input type="submit" value="Submit"><br>
+
+<?php 
+if($tip != null && $total != null) {?>
+<p>	Tip: $<?php echo htmlentities($tip);?><br>
+	Total: $<?php echo htmlentities($total);?></p>
+<?php } ?>
 </form>
 
 
 <br>
 <br>
-<?php 
-if($tip != null && $total != null) {?>
-	Tip: $<?php echo htmlentities($tip);?><br>
-	Total: $<?php echo htmlentities($total);
-}?>
+
 
 </body>
 </html>
