@@ -1,3 +1,3 @@
 # tipCalculator
 
-![alt tag](./tipCalculator.gif)
+![](./tipCalculator.gif)
