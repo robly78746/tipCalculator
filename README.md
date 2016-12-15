@@ -1,3 +1,3 @@
 # tipCalculator
 
-[[https://github.com/robly78746/tipCalculator/tipCalculator.gif|alt=calculator]]
+![alt tag](https://github.com/robly78746/tipCalculator/tipCalculator.gif)
