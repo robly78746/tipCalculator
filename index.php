@@ -6,7 +6,6 @@
 <body>
 <h1>Tip Calculator</h1>
 <?php 
-$valid = false; 
 define("DEFAULT_VAL", "0");
 define("NAN_BILL_ERROR_MESSAGE", "Bill subtotal is not a number");
 define("NAN_TIP_ERROR_MESSAGE", "Tip percentage is not selected");
@@ -36,43 +35,54 @@ $tip = null;
 $total = null;
 $error = '';
 $numErrors = 0;
+$tipValid = false;
+$billValid = false;
 if($_SERVER["REQUEST_METHOD"] == "POST")
 {
+	$tipValid = true;
+	$billValid = true;
 	$billSubtotal = check_input(isset($_POST['billSubtotal']) ? $_POST['billSubtotal'] : '');
 	$tipPercentage = check_input(isset($_POST['tipPercentage']) ? $_POST['tipPercentage'] : '');
 	
 	if(!is_numeric($billSubtotal)) {
 		$error .= NAN_BILL_ERROR_MESSAGE . "\n";
 		$numErrors += 1;
+		$billValid = false;
+	} else {
+		$billSubtotal = floatval($billSubtotal);
 	}
 	if(!is_numeric($tipPercentage)) {
 		$error .= NAN_TIP_ERROR_MESSAGE . "\n";
 		$numErrors += 1;
+		$tipValid = false;
+	} else {
+		$tipPercentage = floatval($tipPercentage);
 	}
 	if($error === '') {
-		$billSubtotal = floatval($billSubtotal);
-		$tipPercentage = floatval($tipPercentage);
+		
+		
 		if(!check_bill($billSubtotal))
 		{
 			$error .= INVALID_BILL_ERROR_MESSAGE . "\n";
 			$numErrors += 1;
+			$billValid = false;
 		}
 		if(!check_percentage($tipPercentage)) {
 			$error .= INVALID_TIP_ERROR_MESSAGE . "\n";
 			$numErrors += 1;
+			$tipValid = false;
 		}
 		if($error === '') {
 			$tipVal = $tipPercentage / 100 * $billSubtotal;
 			$tip = sprintf('%0.2f', $tipVal);
 			$totalVal = $tip + $billSubtotal;
 			$total = sprintf('%0.2f', $totalVal);
-			$valid = true;
 		}
 	}
 }
 
-$billSubtotalVal = $valid ? $billSubtotal : DEFAULT_VAL;
-$tipPercentageVal = $valid ? $tipPercentage : DEFAULT_VAL;
+$billSubtotalVal = $billValid ? $billSubtotal : DEFAULT_VAL;
+$tipPercentageVal = $tipValid ? $tipPercentage : DEFAULT_VAL;
 ?>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 	Bill subtotal: $<input type="text" name="billSubtotal" value = <?php echo htmlentities($billSubtotalVal);?>><br>
