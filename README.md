@@ -35,6 +35,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 ## Notes
 
 Describe any challenges encountered while building the app.
+* Didn't know how to check for missing post variable. I used empty($_POST['var']) at first, but this evaluated to true when $_POST['var'] == 0
 
 ## License
 
