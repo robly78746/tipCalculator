@@ -7,7 +7,12 @@
 <h1>Tip Calculator</h1>
 <?php 
 $valid = false; 
-define("DEFAULT_VAL", 0);
+define("DEFAULT_VAL", "0");
+define("NAN_BILL_ERROR_MESSAGE", "Bill subtotal is not a number");
+define("NAN_TIP_ERROR_MESSAGE", "Tip percentage is not selected");
+define("INVALID_BILL_ERROR_MESSAGE", "Bill subtotal is less than 0");
+define("INVALID_TIP_ERROR_MESSAGE", "Tip percentage is less than 0");
+
 function check_input($data) {
 	$data = trim($data);
 	$data = stripslashes($data);
@@ -24,29 +29,45 @@ function check_bill($bill){
 /*input: float value
 output: true if valid percentage; false if not*/
 function check_percentage($percent) {
-	return $percent >= 0 && $percent <= 100;
+	return $percent >= 0;
 }
 
 $tip = null;
 $total = null;
+$error = '';
+$numErrors = 0;
 if($_SERVER["REQUEST_METHOD"] == "POST")
 {
-	$billSubtotal = check_input(empty($_POST['billSubtotal']) ? '' : $_POST['billSubtotal']);
-	$tipPercentage = check_input(empty($_POST['tipPercentage']) ? '' : $_POST['tipPercentage']);
+	$billSubtotal = check_input(isset($_POST['billSubtotal']) ? $_POST['billSubtotal'] : '');
+	$tipPercentage = check_input(isset($_POST['tipPercentage']) ? $_POST['tipPercentage'] : '');
 	
-
-	if(is_numeric($billSubtotal) && is_numeric($tipPercentage)) {
+	if(!is_numeric($billSubtotal)) {
+		$error .= NAN_BILL_ERROR_MESSAGE . "\n";
+		$numErrors += 1;
+	}
+	if(!is_numeric($tipPercentage)) {
+		$error .= NAN_TIP_ERROR_MESSAGE . "\n";
+		$numErrors += 1;
+	}
+	if($error === '') {
 		$billSubtotal = floatval($billSubtotal);
 		$tipPercentage = floatval($tipPercentage);
-		if(check_bill($billSubtotal) && check_percentage($tipPercentage)) {
+		if(!check_bill($billSubtotal))
+		{
+			$error .= INVALID_BILL_ERROR_MESSAGE . "\n";
+			$numErrors += 1;
+		}
+		if(!check_percentage($tipPercentage)) {
+			$error .= INVALID_TIP_ERROR_MESSAGE . "\n";
+			$numErrors += 1;
+		}
+		if($error === '') {
 			$tipVal = $tipPercentage / 100 * $billSubtotal;
 			$tip = sprintf('%0.2f', $tipVal);
 			$totalVal = $tip + $billSubtotal;
 			$total = sprintf('%0.2f', $totalVal);
 			$valid = true;
 		}
-	} else {
-		$valid = false;
 	}
 }
 
@@ -68,10 +89,14 @@ $percentages = array(10.0,  15.0, 20.0);
 <input type="submit" value="Submit"><br>
 
 <?php 
+if($_SERVER["REQUEST_METHOD"] == "POST"){
 if($tip != null && $total != null) {?>
 <p>	Tip: $<?php echo htmlentities($tip);?><br>
 	Total: $<?php echo htmlentities($total);?></p>
-<?php } ?>
+<?php } else {?>
+<p> Error<?php echo htmlentities($numErrors > 1 ? 's': '');?>: <?php echo nl2br(htmlentities($error));?></p>
+<?php	} 
+}?>
 </form>
 
 
